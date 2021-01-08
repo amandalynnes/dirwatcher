@@ -27,8 +27,11 @@ import logging
 
 exit_flag = False
 logger = logging.getLogger(__name__)
-logging.basicConfig(stream=sys.stdout,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+logging.basicConfig(
+    stream=sys.stdout,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S')
+
 
 def search_for_magic(filename, start_line, magic_string):
     """ Searches for text arg in files, picking up where it left off. """
@@ -90,7 +93,6 @@ def main(args):
     text = parsed_args.text
     extension = parsed_args.extension
 
-
     # Hook into these two signals from the OS
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
@@ -106,12 +108,11 @@ def main(args):
             # This is an UNHANDLED exception
             # Log an ERROR level message here
             logger.error(e)
-        
+
         except Exception as e:
             # This is an UNHANDLED exception
             # Log an ERROR level message here
             logger.error(e)
-
 
         # put a sleep inside my while loop so I don't peg the cpu usage at 100%
         time.sleep(polling_interval)
