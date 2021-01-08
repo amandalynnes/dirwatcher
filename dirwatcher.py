@@ -25,24 +25,36 @@ import logging
 # (please see the hints below if you don't understand what a logging banner is)
 # Read the rubric!
 
+exit_flag = False
+logger = logging.getLogger(__name__)
+logging.basicConfig(stream=sys.stdout,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 
 def search_for_magic(filename, start_line, magic_string):
-    """ """
-
+    """ Searches for text arg in files, picking up where it left off. """
+    with open(filename) as f:
+        for line in f:
+            print(line)
     return
 
 
-def watch_directory(path, magic_string, extension, interval):
-    """ """
+def watch_directory(path, magic_string, extension):
+    """ Monitors files in the specified directory that end
+    in the specified extension for any changes.  """
+    # look at the files in the provided directory that end in the extension
+    # and see which line in the file has the specified text
+    files_in_dir = os.listdir(path)
+    for f in files_in_dir:
+        search_for_magic(path + '/' + f, 0, magic_string)
 
     return
 
 
 def create_parser():
-    """Creates an argument parser object."""
+    """Creates an instance of the parser object."""
     parser = argparse.ArgumentParser()
     parser.add_argument('text', help='magic_string text to search for')
-    parser.add_argument('dir', help='directory to watch for')
+    parser.add_argument('directory', help='directory to watch for')
     parser.add_argument('extension', help='required file extension')
     parser.add_argument('interval', help='polling interval', type=int)
 
@@ -59,16 +71,11 @@ def signal_handler(sig_num, frame):
     :param frame: Not used
     :return None
     """
-    logger = logging.getLogger(__name__)
-    # https://realpython.com/python-logging/
-    f_handler = logging.FileHandler('file.log')
-    f_handler.setLevel(logging.warning)
-    f_format = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    f_handler.setFormatter(f_format)
-    logger.addHandler(f_handler)
+    global exit_flag
     # log the associated signal name
+    print('testing')
     logger.warning('Received ' + signal.Signals(sig_num).name)
+    exit_flag = True
     return
 
 
@@ -79,6 +86,10 @@ def main(args):
 
     parsed_args = parser.parse_args(args)
     polling_interval = parsed_args.interval
+    directory = parsed_args.directory
+    text = parsed_args.text
+    extension = parsed_args.extension
+
 
     # Hook into these two signals from the OS
     signal.signal(signal.SIGINT, signal_handler)
@@ -86,17 +97,21 @@ def main(args):
     # Now my signal_handler will get called if OS sends
     # either of these to my process.
 
-    exit_flag = False
     while not exit_flag:
         try:
             # call my directory watching function
-            print('hello')
-        except Exception as e:
-            global exit_flag
+            watch_directory(directory, text, extension)
+
+        except OSError as e:
             # This is an UNHANDLED exception
             # Log an ERROR level message here
-            print(e)
-            exit_flag = True
+            logger.error(e)
+        
+        except Exception as e:
+            # This is an UNHANDLED exception
+            # Log an ERROR level message here
+            logger.error(e)
+
 
         # put a sleep inside my while loop so I don't peg the cpu usage at 100%
         time.sleep(polling_interval)
