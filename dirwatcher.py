@@ -6,6 +6,8 @@ Dirwatcher - A long-running program
 __author__ = "Amanda Simmons"
 
 import sys
+import time
+import os
 
 
 def search_for_magic(filename, start_line, magic_string):
@@ -29,7 +31,9 @@ def signal_handler(sig_num, frame):
 
 
 def main(args):
-    # Your code here
+    while True:
+        print(f'my PID is: {os.getpid()} ')
+        time.sleep(1)
     return
 
 
