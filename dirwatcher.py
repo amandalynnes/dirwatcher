@@ -53,11 +53,15 @@ def watch_directory(path, magic_string, extension):
     in the specified extension for any changes.  """
     # look at the files in the provided directory that end in the extension
     # and see which line in the file has the specified text
+    txt_dict = {}
     files_in_dir = os.listdir(path)
     for f in files_in_dir:
         match_ext_obj = re.search(r".+(\.\w+)", f)
         ext = match_ext_obj.group(1)
         if ext == '.txt':
+            if f not in txt_dict:
+                # txt_dict.update(f:)
+                logger.info(f'Added: {f}')
             search_for_magic(path + '/' + f, 0, magic_string)
 
     return
