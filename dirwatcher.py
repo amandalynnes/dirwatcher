@@ -3,7 +3,7 @@
 Dirwatcher - A long-running program
 """
 
-__author__ = "Amanda Simmons, Piero Mader, Pete Mayor"
+__author__ = "Amanda Simmons, Piero Mader, Pete Mayor, Alec Stephens"
 
 import sys
 import time
@@ -33,7 +33,9 @@ logging.basicConfig(
     # stream=sys.stdout,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S',
-    level=logging.INFO,)
+    level=logging.DEBUG,)
+
+txt_dict = {}
 
 
 def search_for_magic(filename, start_line, magic_string):
@@ -41,11 +43,9 @@ def search_for_magic(filename, start_line, magic_string):
     with open(filename) as f:
         for index, line in enumerate(f):
             if magic_string in line:
-                logger.info(f'I found "{magic_string}" on line {index}')
-            else:
-                pass
-
-    return
+                if index >= start_line:
+                    txt_dict[filename] = index + 1
+                    logger.info(f'I found "{magic_string}" on line {index}')
 
 
 def watch_directory(path, magic_string, extension):
@@ -53,18 +53,20 @@ def watch_directory(path, magic_string, extension):
     in the specified extension for any changes.  """
     # look at the files in the provided directory that end in the extension
     # and see which line in the file has the specified text
-    txt_dict = {}
+
     files_in_dir = os.listdir(path)
+    for k in txt_dict.keys():
+        if k not in files_in_dir:
+            del txt_dict[k]
+            logger.info(f'Deleted: {k}')
     for f in files_in_dir:
         match_ext_obj = re.search(r".+(\.\w+)", f)
         ext = match_ext_obj.group(1)
         if ext == '.txt':
             if f not in txt_dict:
-                # txt_dict.update(f:)
+                txt_dict[f] = 0
                 logger.info(f'Added: {f}')
             search_for_magic(path + '/' + f, 0, magic_string)
-
-    return
 
 
 def create_parser():
@@ -121,12 +123,12 @@ def main(args):
         except OSError as e:
             # This is an UNHANDLED exception
             # Log an ERROR level message here
-            logger.error(e)
+            logger.debug(e)
 
         except Exception as e:
             # This is an UNHANDLED exception
             # Log an ERROR level message here
-            logger.error(e)
+            logger.debug(e)
 
         # put a sleep inside my while loop so I don't peg the cpu usage at 100%
         time.sleep(polling_interval)
