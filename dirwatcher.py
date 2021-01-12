@@ -8,6 +8,7 @@ __author__ = "Amanda Simmons, Piero Mader, Pete Mayor"
 import sys
 import time
 import os
+import re
 import argparse
 import signal
 import logging
@@ -36,8 +37,11 @@ logging.basicConfig(
 def search_for_magic(filename, start_line, magic_string):
     """ Searches for text arg in files, picking up where it left off. """
     with open(filename) as f:
-        for line in f:
-            print(line)
+        for index, line in enumerate(f):
+            if magic_string in line:
+                print(f'I found "{magic_string}" on line {index}')
+            else:
+                print(f'"{magic_string}" not detected on line {index}')
     return
 
 
@@ -48,7 +52,11 @@ def watch_directory(path, magic_string, extension):
     # and see which line in the file has the specified text
     files_in_dir = os.listdir(path)
     for f in files_in_dir:
-        search_for_magic(path + '/' + f, 0, magic_string)
+        match_ext_obj = re.search(r".+(\.\w+)", f)
+        ext = match_ext_obj.group(1)
+        print(ext)
+        if ext == '.txt':
+            search_for_magic(path + '/' + f, 0, magic_string)
 
     return
 
@@ -83,7 +91,7 @@ def signal_handler(sig_num, frame):
 
 
 def main(args):
-    """ """
+    """  """
     print(f'my PID is: {os.getpid()} ')
     parser = create_parser()
 
