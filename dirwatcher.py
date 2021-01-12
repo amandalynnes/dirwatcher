@@ -28,8 +28,8 @@ import logging
 exit_flag = False
 logger = logging.getLogger(__name__)
 logging.basicConfig(
-    filename='search_results.log',
-    # stream=sys.stdout,
+    # filename='search_results.log',
+    stream=sys.stdout,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%m/%d/%Y %I:%M:%S %p',
     level=logging.DEBUG,)
@@ -40,11 +40,13 @@ txt_dict = {}
 def search_for_magic(filename, start_line, magic_string):
     """ Searches for text arg in files, picking up where it left off. """
     with open(filename) as f:
+        index = -1
         for index, line in enumerate(f):
-            if magic_string in line:
-                if index >= start_line:
-                    txt_dict[filename] = index + 1
-                    logger.info(f'"{magic_string}" found on line {index}')
+            if index >= start_line:
+                if magic_string in line:
+                    logger.info(f'"{magic_string}" found on line {index+1}')
+        # moves the bookmark whether string found or not
+        txt_dict[filename] = index + 1
 
 
 def watch_directory(path, magic_string, extension):
@@ -53,26 +55,32 @@ def watch_directory(path, magic_string, extension):
     # look at the files in the provided directory that end in the extension
     # and see which line in the file has the specified text
 
-    files_in_dir = os.listdir(path)
-    for k in txt_dict.keys():
+    files_in_dir = [path + '/' + f for f in os.listdir(path)]
+    # this is where I am removing files from my watch list
+    for k in list(txt_dict):
         if k not in files_in_dir:
             del txt_dict[k]
             logger.info(f'{k} file DELETED')
+    # this is where I am adding files to my watch list
     for f in files_in_dir:
-        if f.endswith('.txt'):
+        if f.endswith(extension):
             if f not in txt_dict:
                 txt_dict[f] = 0
                 logger.info(f'{f} file ADDED')
-            search_for_magic(path + '/' + f, 0, magic_string)
+    for f in txt_dict:
+        # change this to use os.path.join to work with every os
+        search_for_magic(f, txt_dict[f], magic_string)
 
 
 def create_parser():
     """Creates an instance of the parser object."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('text', help='magic_string text to search for')
     parser.add_argument('directory', help='directory to watch for')
-    parser.add_argument('extension', help='required file extension')
-    parser.add_argument('interval', help='polling interval', type=int)
+    parser.add_argument('text', help='magic_string text to search for')
+    parser.add_argument(
+        '--extension', help='required file extension', default='.txt')
+    parser.add_argument(
+        '--interval', help='polling interval', type=int, default=1)
 
     return parser
 
@@ -124,12 +132,12 @@ def main(args):
         except OSError as e:
             # This is an UNHANDLED exception
             # Log an ERROR level message here
-            logger.debug(e)
+            logger.error(e)
 
         except Exception as e:
             # This is an UNHANDLED exception
             # Log an ERROR level message here
-            logger.debug(e)
+            logger.error(e)
 
         # put a sleep inside my while loop so I don't peg the cpu usage at 100%
         time.sleep(polling_interval)
