@@ -29,9 +29,11 @@ import logging
 exit_flag = False
 logger = logging.getLogger(__name__)
 logging.basicConfig(
-    stream=sys.stdout,
+    filename='search_results.log',
+    # stream=sys.stdout,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S')
+    datefmt='%Y-%m-%d %H:%M:%S',
+    level=logging.INFO,)
 
 
 def search_for_magic(filename, start_line, magic_string):
@@ -39,9 +41,10 @@ def search_for_magic(filename, start_line, magic_string):
     with open(filename) as f:
         for index, line in enumerate(f):
             if magic_string in line:
-                print(f'I found "{magic_string}" on line {index}')
+                logger.info(f'I found "{magic_string}" on line {index}')
             else:
-                print(f'"{magic_string}" not detected on line {index}')
+                pass
+
     return
 
 
@@ -54,7 +57,6 @@ def watch_directory(path, magic_string, extension):
     for f in files_in_dir:
         match_ext_obj = re.search(r".+(\.\w+)", f)
         ext = match_ext_obj.group(1)
-        print(ext)
         if ext == '.txt':
             search_for_magic(path + '/' + f, 0, magic_string)
 
@@ -84,15 +86,15 @@ def signal_handler(sig_num, frame):
     """
     global exit_flag
     # log the associated signal name
-    print('testing')
     logger.warning('Received ' + signal.Signals(sig_num).name)
+
     exit_flag = True
     return
 
 
 def main(args):
     """  """
-    print(f'my PID is: {os.getpid()} ')
+    # print(f'my PID is: {os.getpid()} ')
     parser = create_parser()
 
     parsed_args = parser.parse_args(args)
