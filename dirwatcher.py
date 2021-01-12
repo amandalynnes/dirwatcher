@@ -8,7 +8,6 @@ __author__ = "Amanda Simmons, Piero Mader, Pete Mayor, Alec Stephens"
 import sys
 import time
 import os
-# import re
 import argparse
 import signal
 import logging
@@ -45,7 +44,7 @@ def search_for_magic(filename, start_line, magic_string):
             if magic_string in line:
                 if index >= start_line:
                     txt_dict[filename] = index + 1
-                    logger.info(f'I found "{magic_string}" on line {index}')
+                    logger.info(f'"{magic_string}" found on line {index}')
 
 
 def watch_directory(path, magic_string, extension):
@@ -58,13 +57,12 @@ def watch_directory(path, magic_string, extension):
     for k in txt_dict.keys():
         if k not in files_in_dir:
             del txt_dict[k]
-            print(txt_dict)
-            logger.info(f'Deleted: {k}')
+            logger.info(f'{k} file DELETED')
     for f in files_in_dir:
         if f.endswith('.txt'):
             if f not in txt_dict:
                 txt_dict[f] = 0
-                logger.info(f'Added: {f}')
+                logger.info(f'{f} file ADDED')
             search_for_magic(path + '/' + f, 0, magic_string)
 
 
@@ -100,7 +98,9 @@ def signal_handler(sig_num, frame):
 
 
 def main(args):
-    """  """
+    """ Runs parser, runs watch directory function and
+    catches any exceptions """
+
     logger.info(f'Started process: {os.getpid()}')
     parser = create_parser()
 
