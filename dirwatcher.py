@@ -58,11 +58,13 @@ def watch_directory(path, magic_string, extension):
     for k in txt_dict.keys():
         if k not in files_in_dir:
             del txt_dict[k]
+            print(txt_dict)
             logger.info(f'Deleted: {k}')
     for f in files_in_dir:
         if f.endswith('.txt'):
             if f not in txt_dict:
                 txt_dict[f] = 0
+                print(txt_dict)
                 logger.info(f'Added: {f}')
             search_for_magic(path + '/' + f, 0, magic_string)
 
@@ -93,12 +95,13 @@ def signal_handler(sig_num, frame):
     logger.warning('Received ' + signal.Signals(sig_num).name)
 
     exit_flag = True
+    if exit_flag:
+        logger.info(f'Stopped process: {os.getpid()}')
     return
 
 
 def main(args):
     """  """
-    # print(f'my PID is: {os.getpid()} ')
     logger.info(f'Started process: {os.getpid()}')
     parser = create_parser()
 
