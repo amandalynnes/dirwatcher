@@ -8,7 +8,7 @@ __author__ = "Amanda Simmons, Piero Mader, Pete Mayor, Alec Stephens"
 import sys
 import time
 import os
-import re
+# import re
 import argparse
 import signal
 import logging
@@ -60,9 +60,7 @@ def watch_directory(path, magic_string, extension):
             del txt_dict[k]
             logger.info(f'Deleted: {k}')
     for f in files_in_dir:
-        match_ext_obj = re.search(r".+(\.\w+)", f)
-        ext = match_ext_obj.group(1)
-        if ext == '.txt':
+        if f.endswith('.txt'):
             if f not in txt_dict:
                 txt_dict[f] = 0
                 logger.info(f'Added: {f}')
@@ -101,7 +99,7 @@ def signal_handler(sig_num, frame):
 def main(args):
     """  """
     # print(f'my PID is: {os.getpid()} ')
-    # logger.info()
+    logger.info(f'Started process: {os.getpid()}')
     parser = create_parser()
 
     parsed_args = parser.parse_args(args)
