@@ -64,7 +64,6 @@ def watch_directory(path, magic_string, extension):
         if f.endswith('.txt'):
             if f not in txt_dict:
                 txt_dict[f] = 0
-                print(txt_dict)
                 logger.info(f'Added: {f}')
             search_for_magic(path + '/' + f, 0, magic_string)
 
