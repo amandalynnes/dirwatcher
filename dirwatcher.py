@@ -32,7 +32,7 @@ logging.basicConfig(
     filename='search_results.log',
     # stream=sys.stdout,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
+    datefmt='%m/%d/%Y %I:%M:%S %p',
     level=logging.DEBUG,)
 
 txt_dict = {}
@@ -101,6 +101,7 @@ def signal_handler(sig_num, frame):
 def main(args):
     """  """
     # print(f'my PID is: {os.getpid()} ')
+    # logger.info()
     parser = create_parser()
 
     parsed_args = parser.parse_args(args)
