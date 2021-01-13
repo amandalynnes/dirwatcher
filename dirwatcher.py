@@ -101,7 +101,17 @@ def signal_handler(sig_num, frame):
 
     exit_flag = True
     if exit_flag:
-        logger.info(f'Stopped process: {os.getpid()}')
+        logger.info(
+            "\n"
+            "---------------------------------------------------------------\n"
+            "       Stopped: {0}\n"
+            "       PID: {1}\n"
+            "       Start time: {2}\n"
+            "---------------------------------------------------------------\n"
+            .format(__file__, os.getpid(),
+                    time.strftime("%m/%d/%Y %I:%M:%S %p"))
+        )
+        # logger.info(f'Stopped process: {os.getpid()}')
     return
 
 
@@ -109,7 +119,17 @@ def main(args):
     """ Runs parser, runs watch directory function and
     catches any exceptions """
 
-    logger.info(f'Started process: {os.getpid()}')
+    logger.info(
+        "\n"
+        "-------------------------------------------------------------------\n"
+        "       Started: {0}\n"
+        "       PID: {1}\n"
+        "       Start time: {2}\n"
+        "-------------------------------------------------------------------\n"
+        .format(__file__, os.getpid(), time.strftime("%m/%d/%Y %I:%M:%S %p"))
+    )
+
+    # logger.info(f'Started process: {os.getpid()}')
     parser = create_parser()
 
     parsed_args = parser.parse_args(args)
