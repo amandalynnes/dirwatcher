@@ -11,7 +11,7 @@ import os
 import argparse
 import signal
 import logging
-from uptime import uptime
+import datetime
 
 # Success Criteria
 # Use all best practices that have been taught so far: docstrings, PEP8,
@@ -29,22 +29,12 @@ from uptime import uptime
 exit_flag = False
 logger = logging.getLogger(__name__)
 logging.basicConfig(
-    # filename='search_results.log',
     stream=sys.stdout,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%m/%d/%Y %I:%M:%S %p',
     level=logging.DEBUG,)
 
 txt_dict = {}
-
-
-def current_time():
-    return time.strftime("%m/%d/%Y %I:%M:%S %p")
-
-
-def up_time():
-    os.getpid()
-    return uptime()
 
 
 def search_for_magic(filename, start_line, magic_string):
@@ -108,22 +98,8 @@ def signal_handler(sig_num, frame):
     global exit_flag
     # log the associated signal name
     logger.warning('Received ' + signal.Signals(sig_num).name)
-
     exit_flag = True
-    if exit_flag:
-        # this banner was built off of Alec Stephens banner code
-        logger.info(
-            "\n"
-            "---------------------------------------------------------------\n"
-            "       Stopped: {0}\n"
-            "       PID: {1}\n"
-            "       Stop time: {2}\n"
-            "       Uptime: {3}\n"
-            "---------------------------------------------------------------\n"
-            .format(__file__, os.getpid(),
-                    current_time(), up_time())
-        )
-        # logger.info(f'Stopped process: {os.getpid()}')
+
     return
 
 
@@ -131,18 +107,14 @@ def main(args):
     """ Runs parser, runs watch directory function and
     catches any exceptions """
 
-    # this banner was built off of Alec Stephens banner code
+    prog_start = datetime.datetime.now()
     logger.info(
-        "\n"
-        "-------------------------------------------------------------------\n"
-        "       Started: {0}\n"
-        "       PID: {1}\n"
-        "       Start time: {2}\n"
-        "-------------------------------------------------------------------\n"
-        .format(__file__, os.getpid(), current_time())
-    )
+            "\n" + "-"*80 +
+            f'\nStarted: {__file__}' +
+            f'\nPid: {os.getpid()}' +
+            f'\nStart time: {prog_start}' +
+            "\n" + "-"*80)
 
-    # logger.info(f'Started process: {os.getpid()}')
     parser = create_parser()
 
     parsed_args = parser.parse_args(args)
@@ -175,11 +147,20 @@ def main(args):
         # put a sleep inside my while loop so I don't peg the cpu usage at 100%
         time.sleep(polling_interval)
 
+    if exit_flag:
+        prog_stop = datetime.datetime.now()
+        uptime = prog_stop - prog_start
+
+        logger.info(
+            "\n" + "-"*80 +
+            f'\nStopped: {__file__}' +
+            f'\nPid: {os.getpid()}' +
+            f'\nUptime: {uptime}' +
+            "\n" + "-"*80)
+        # logger.info(f'Stopped process: {os.getpid()}')
     # final exit point happens here
     # Log a message that we are shutting down
     # Include the overall uptime since program start
-
-    return
 
 
 if __name__ == '__main__':
