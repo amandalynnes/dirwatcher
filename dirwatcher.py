@@ -11,6 +11,7 @@ import os
 import argparse
 import signal
 import logging
+from uptime import uptime
 
 # Success Criteria
 # Use all best practices that have been taught so far: docstrings, PEP8,
@@ -35,6 +36,15 @@ logging.basicConfig(
     level=logging.DEBUG,)
 
 txt_dict = {}
+
+
+def current_time():
+    return time.strftime("%m/%d/%Y %I:%M:%S %p")
+
+
+def up_time():
+    os.getpid()
+    return uptime()
 
 
 def search_for_magic(filename, start_line, magic_string):
@@ -101,15 +111,17 @@ def signal_handler(sig_num, frame):
 
     exit_flag = True
     if exit_flag:
+        # this banner was built off of Alec Stephens banner code
         logger.info(
             "\n"
             "---------------------------------------------------------------\n"
             "       Stopped: {0}\n"
             "       PID: {1}\n"
-            "       Start time: {2}\n"
+            "       Stop time: {2}\n"
+            "       Uptime: {3}\n"
             "---------------------------------------------------------------\n"
             .format(__file__, os.getpid(),
-                    time.strftime("%m/%d/%Y %I:%M:%S %p"))
+                    current_time(), up_time())
         )
         # logger.info(f'Stopped process: {os.getpid()}')
     return
@@ -119,6 +131,7 @@ def main(args):
     """ Runs parser, runs watch directory function and
     catches any exceptions """
 
+    # this banner was built off of Alec Stephens banner code
     logger.info(
         "\n"
         "-------------------------------------------------------------------\n"
@@ -126,7 +139,7 @@ def main(args):
         "       PID: {1}\n"
         "       Start time: {2}\n"
         "-------------------------------------------------------------------\n"
-        .format(__file__, os.getpid(), time.strftime("%m/%d/%Y %I:%M:%S %p"))
+        .format(__file__, os.getpid(), current_time())
     )
 
     # logger.info(f'Started process: {os.getpid()}')
