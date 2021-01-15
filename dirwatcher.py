@@ -43,8 +43,10 @@ def search_for_magic(filename, start_line, magic_string):
         index = -1
         for index, line in enumerate(f):
             if index >= start_line:
+                ms = magic_string
                 if magic_string in line:
-                    logger.info(f'"{magic_string}" found on line {index+1}')
+                    logger.info(
+                        f'Found: {ms}, File: {filename}, Index: {index+1}')
         # moves the bookmark whether string found or not
         txt_dict[filename] = index + 1
 
