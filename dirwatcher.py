@@ -76,7 +76,8 @@ def create_parser():
     """Creates an instance of the parser object."""
     parser = argparse.ArgumentParser()
     parser.add_argument('directory', help='directory to watch for')
-    parser.add_argument('text', help='magic_string text to search for')
+    parser.add_argument('--text', help='magic_string text to search for',
+                        default='hello')
     parser.add_argument(
         '--extension', help='required file extension', default='.txt')
     parser.add_argument(
